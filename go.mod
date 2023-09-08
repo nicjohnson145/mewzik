@@ -3,7 +3,9 @@ module github.com/nicjohnson145/mewzik
 go 1.20
 
 require (
+	github.com/deckarep/golang-set v1.8.0
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
+	github.com/psanford/memfs v0.0.0-20230130182539-4dbf7e3e865e
 	github.com/rs/zerolog v1.30.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.16.0
