@@ -27,7 +27,7 @@ func computeDestinationPath(fsys fs.FS, overrides MetadataOverride, path string)
 		return "", fmt.Errorf("error parsing metadata: %w", err)
 	}
 
-	if metadata.Artist() == "" && overrides.Artist == "" {
+	if metadata.Artist() == "" && overrides.Artist == "" && metadata.AlbumArtist() == "" {
 		return "", fmt.Errorf("%w: artist", ErrMissingMetadataError)
 	}
 
@@ -46,7 +46,11 @@ func computeDestinationPath(fsys fs.FS, overrides MetadataOverride, path string)
 
 	artist := overrides.Artist
 	if artist == "" {
-		artist = metadata.Artist()
+		if metadata.AlbumArtist() != "" {
+			artist = metadata.AlbumArtist()
+		} else {
+			artist = metadata.Artist()
+		}
 	}
 
 	album := overrides.Album

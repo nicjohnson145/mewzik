@@ -55,6 +55,7 @@ func Root() *cobra.Command {
 
 	rootCmd.AddCommand(
 		versionCmd(),
+		multiCmd(),
 	)
 
 	return rootCmd
