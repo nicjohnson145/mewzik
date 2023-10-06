@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/deckarep/golang-set v1.8.0
+	github.com/deckarep/golang-set/v2 v2.3.1
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/jarxorg/wfs v0.3.2
 	github.com/psanford/memfs v0.0.0-20230130182539-4dbf7e3e865e

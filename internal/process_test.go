@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	mapset "github.com/deckarep/golang-set"
+	"github.com/deckarep/golang-set/v2"
 	"github.com/jarxorg/wfs/osfs"
 	"github.com/psanford/memfs"
 	"github.com/stretchr/testify/require"

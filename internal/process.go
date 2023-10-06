@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"github.com/deckarep/golang-set"
+	"github.com/deckarep/golang-set/v2"
 	"github.com/jarxorg/wfs"
 	"github.com/rs/zerolog"
 	"io/fs"
@@ -17,7 +17,7 @@ type ProcessorConfig struct {
 	Logger     zerolog.Logger
 	InputFS    fs.FS
 	OutputFS   wfs.WriteFileFS
-	Extensions mapset.Set
+	Extensions mapset.Set[string]
 	Overrides  MetadataOverride
 }
 
@@ -35,7 +35,7 @@ type Processor struct {
 	log        zerolog.Logger
 	inputFS    fs.FS
 	outputFS   wfs.WriteFileFS
-	extensions mapset.Set
+	extensions mapset.Set[string]
 	overrides  MetadataOverride
 }
 

@@ -8,12 +8,25 @@ import (
 )
 
 const (
-	Debug             = "debug"
+	Debug = "debug"
+
+	OutputDir  = "output-dir"
+	Extensions = "extensions"
+
+	Artist = "artist"
+	Album  = "album"
+)
+
+const (
+	DefaultExtensions = ".mp3"
 )
 
 func InitializeConfig(cmd *cobra.Command) error {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+
+	viper.SetDefault(Extensions, DefaultExtensions)
+
 	viper.BindPFlags(cmd.Flags())
 
 	return nil
