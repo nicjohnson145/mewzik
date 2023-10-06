@@ -5,17 +5,18 @@ import (
 	"fmt"
 	"io/fs"
 
+	"errors"
 	"github.com/dhowden/tag"
 	"path/filepath"
 	"regexp"
-	"errors"
 )
 
-var multipleUnderscoresRegex = regexp.MustCompile(`_{2,}`)
+var (
+	multipleUnderscoresRegex = regexp.MustCompile(`_{2,}`)
+	ErrMissingMetadataError  = errors.New("missing metadata")
+)
 
-var ErrMissingMetadataError = errors.New("missing metadata")
-
-func computeDestinationPath(fsys fs.FS, path string) (string, error) {
+func computeDestinationPath(fsys fs.FS, overrides MetadataOverride, path string) (string, error) {
 	content, err := fs.ReadFile(fsys, path)
 	if err != nil {
 		return "", fmt.Errorf("error reading file: %w", err)
@@ -26,11 +27,11 @@ func computeDestinationPath(fsys fs.FS, path string) (string, error) {
 		return "", fmt.Errorf("error parsing metadata: %w", err)
 	}
 
-	if metadata.Artist() == "" {
+	if metadata.Artist() == "" && overrides.Artist == "" {
 		return "", fmt.Errorf("%w: artist", ErrMissingMetadataError)
 	}
 
-	if metadata.Album() == "" {
+	if metadata.Album() == "" && overrides.Album == "" {
 		return "", fmt.Errorf("%w: album", ErrMissingMetadataError)
 	}
 
@@ -43,13 +44,22 @@ func computeDestinationPath(fsys fs.FS, path string) (string, error) {
 		return "", fmt.Errorf("%w: track", ErrMissingMetadataError)
 	}
 
+	artist := overrides.Artist
+	if artist == "" {
+		artist = metadata.Artist()
+	}
+
+	album := overrides.Album
+	if album == "" {
+		album = metadata.Album()
+	}
+
 	return filepath.Join(
-		escape(metadata.Artist()),
-		escape(metadata.Album()),
+		escape(artist),
+		escape(album),
 		fmt.Sprintf("%02d_%v", track, escape(metadata.Title())),
 	) + filepath.Ext(path), nil
 }
-
 
 func escape(s string) string {
 	runes := []rune{}
