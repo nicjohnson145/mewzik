@@ -12,12 +12,13 @@ import (
 )
 
 type MetadataOverride struct {
-	Artist string
-	Album  string
+	Artist      string
+	Album       string
+	AlbumArtist string
 }
 
 func (m *MetadataOverride) active() bool {
-	return m.Artist != "" || m.Album != ""
+	return m.Artist != "" || m.Album != "" || m.AlbumArtist != ""
 }
 
 type ProcessorConfig struct {
@@ -163,6 +164,10 @@ func (p *Processor) overwriteSingleTag(path string) error {
 
 	if p.overrides.Album != "" {
 		tag.SetAlbum(p.overrides.Album)
+	}
+
+	if p.overrides.AlbumArtist != "" {
+		tag.AddTextFrame(tag.CommonID("Band/Orchestra/Accompaniment"), tag.DefaultEncoding(), p.overrides.AlbumArtist)
 	}
 
 	if err := tag.Save(); err != nil {
