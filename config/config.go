@@ -13,8 +13,9 @@ const (
 	OutputDir  = "output-dir"
 	Extensions = "extensions"
 
-	Artist = "artist"
-	Album  = "album"
+	Artist      = "artist"
+	Album       = "album"
+	AlbumArtist = "album-artist"
 )
 
 const (

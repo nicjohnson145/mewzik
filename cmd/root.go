@@ -39,7 +39,8 @@ func Root() *cobra.Command {
 				Extensions: mapset.NewSet(strings.Split(viper.GetString(config.Extensions), ",")...),
 				Overrides: internal.MetadataOverride{
 					Artist: viper.GetString(config.Artist),
-					Album: viper.GetString(config.Album),
+					Album:  viper.GetString(config.Album),
+					AlbumArtist: viper.GetString(config.AlbumArtist),
 				},
 			})
 			if err != nil {
@@ -56,6 +57,7 @@ func Root() *cobra.Command {
 
 	rootCmd.Flags().StringP(config.Artist, "a", "", "Force file artist, disregarding file metadata")
 	rootCmd.Flags().StringP(config.Album, "b", "", "Force file album, disregarding file metadata")
+	rootCmd.Flags().StringP(config.AlbumArtist, "l", "", "Force file album artist, disregarding file metadata")
 
 	rootCmd.AddCommand(
 		versionCmd(),

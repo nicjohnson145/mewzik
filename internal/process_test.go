@@ -6,12 +6,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/deckarep/golang-set/v2"
+	"sort"
+
+	mapset "github.com/deckarep/golang-set/v2"
+	"github.com/dhowden/tag"
 	"github.com/jarxorg/wfs/osfs"
 	"github.com/psanford/memfs"
 	"github.com/stretchr/testify/require"
-	"sort"
-	"github.com/dhowden/tag"
 )
 
 func mustTouch(t *testing.T, fsys *memfs.FS, path string) {
@@ -112,6 +113,7 @@ func TestProcess(t *testing.T) {
 			Overrides: MetadataOverride{
 				Album: "New Album",
 				Artist: "New Artist",
+				AlbumArtist: "New Album Artist",
 			},
 		})
 		require.NoError(t, err)
