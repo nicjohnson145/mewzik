@@ -31,16 +31,20 @@ func Root() *cobra.Command {
 				return fmt.Errorf("%v required", config.OutputDir)
 			}
 
-			proc := internal.NewProcessor(internal.ProcessorConfig{
+			proc, err := internal.NewProcessor(internal.ProcessorConfig{
 				Logger:     config.InitLogger(),
 				InputFS:    os.DirFS(args[0]),
 				OutputFS:   osfs.New(outputPath),
+				OutputRoot: outputPath,
 				Extensions: mapset.NewSet(strings.Split(viper.GetString(config.Extensions), ",")...),
 				Overrides: internal.MetadataOverride{
 					Artist: viper.GetString(config.Artist),
 					Album: viper.GetString(config.Album),
 				},
 			})
+			if err != nil {
+				return err
+			}
 
 			return proc.Process()
 		},

@@ -11,6 +11,7 @@ import (
 	"github.com/psanford/memfs"
 	"github.com/stretchr/testify/require"
 	"sort"
+	"github.com/dhowden/tag"
 )
 
 func mustTouch(t *testing.T, fsys *memfs.FS, path string) {
@@ -28,9 +29,10 @@ func TestGetFileList(t *testing.T) {
 		mustTouch(t, rootFS, "artist2/album 3/song2.mp3")
 		mustTouch(t, rootFS, "artist2/album 3/README.rst")
 
-		proc := NewProcessor(ProcessorConfig{
+		proc, err := NewProcessor(ProcessorConfig{
 			Extensions: mapset.NewSet(".mp3"),
 		})
+		require.NoError(t, err)
 
 		got, err := proc.getFileList(rootFS)
 		require.NoError(t, err)
@@ -48,22 +50,11 @@ func TestGetFileList(t *testing.T) {
 }
 
 func TestProcess(t *testing.T) {
-	t.Run("smokes", func(t *testing.T) {
-		dir := t.TempDir()
-
-		input := os.DirFS("./testdata/sample-files/Anders - 669")
-		output := osfs.New(dir)
-
-		p := NewProcessor(ProcessorConfig{
-			InputFS: input,
-			OutputFS: output,
-			Extensions: mapset.NewSet(".mp3"),
-		})
-
-		require.NoError(t, p.Process())
+	sortedFileList := func(t *testing.T, fsys fs.FS) []string {
+		t.Helper()
 
 		files := []string{}
-		require.NoError(t, fs.WalkDir(output, ".", func(path string, d fs.DirEntry, e1 error) error {
+		require.NoError(t, fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, e1 error) error {
 			if e1 != nil {
 				return e1
 			}
@@ -77,6 +68,26 @@ func TestProcess(t *testing.T) {
 		}))
 
 		sort.Strings(files)
+
+		return files
+	}
+
+	t.Run("smokes", func(t *testing.T) {
+		dir := t.TempDir()
+
+		input := os.DirFS("./testdata/sample-files/Anders - 669")
+		output := osfs.New(dir)
+
+		p, err := NewProcessor(ProcessorConfig{
+			InputFS: input,
+			OutputFS: output,
+			Extensions: mapset.NewSet(".mp3"),
+		})
+		require.NoError(t, err)
+
+		require.NoError(t, p.Process())
+		files := sortedFileList(t, output)
+
 		require.Equal(
 			t,
 			[]string{
@@ -85,5 +96,44 @@ func TestProcess(t *testing.T) {
 			},
 			files,
 		)
+	})
+
+	t.Run("with overrides", func(t *testing.T) {
+		dir := t.TempDir()
+
+		input := os.DirFS("./testdata/sample-files/Anders - 669")
+		output := osfs.New(dir)
+
+		p, err := NewProcessor(ProcessorConfig{
+			InputFS: input,
+			OutputFS: output,
+			Extensions: mapset.NewSet(".mp3"),
+			OutputRoot: dir,
+			Overrides: MetadataOverride{
+				Album: "New Album",
+				Artist: "New Artist",
+			},
+		})
+		require.NoError(t, err)
+		require.NoError(t, p.Process())
+		require.Equal(
+			t,
+			[]string{
+				"New_Artist/New_Album/01_With_or_Without.mp3",
+				"New_Artist/New_Album/02_Diamonds.mp3",
+			},
+			sortedFileList(t, output),
+		)
+
+		// Also the ID3 tags on the files should be updated as well
+		f, err := os.Open(filepath.Join(dir, "New_Artist/New_Album/01_With_or_Without.mp3"))
+		require.NoError(t, err)
+		defer f.Close()
+
+		md, err := tag.ReadFrom(f)
+		require.NoError(t, err)
+
+		require.Equal(t, "New Artist", md.Artist())
+		require.Equal(t, "New Album", md.Album())
 	})
 }

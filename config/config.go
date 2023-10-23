@@ -27,7 +27,5 @@ func InitializeConfig(cmd *cobra.Command) error {
 
 	viper.SetDefault(Extensions, DefaultExtensions)
 
-	viper.BindPFlags(cmd.Flags())
-
-	return nil
+	return viper.BindPFlags(cmd.Flags())
 }

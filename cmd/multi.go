@@ -36,12 +36,15 @@ func multiCmd() *cobra.Command {
 			extensions := mapset.NewSet(strings.Split(viper.GetString(config.Extensions), ",")...)
 
 			for _, dir := range args {
-				proc := internal.NewProcessor(internal.ProcessorConfig{
+				proc, err := internal.NewProcessor(internal.ProcessorConfig{
 					Logger:     logger,
 					InputFS:    os.DirFS(dir),
 					OutputFS:   outputFS,
 					Extensions: extensions,
 				})
+				if err != nil {
+					return err
+				}
 				if err := proc.Process(); err != nil {
 					return err
 				}

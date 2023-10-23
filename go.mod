@@ -3,7 +3,7 @@ module github.com/nicjohnson145/mewzik
 go 1.20
 
 require (
-	github.com/deckarep/golang-set v1.8.0
+	github.com/bogem/id3v2/v2 v2.1.4
 	github.com/deckarep/golang-set/v2 v2.3.1
 	github.com/dhowden/tag v0.0.0-20230630033851-978a0926ee25
 	github.com/jarxorg/wfs v0.3.2
